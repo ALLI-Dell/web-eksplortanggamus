@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// 1. Model Destinasi Wisata Tanggamus
+model Destination {
+  id               Int      @id @default(autoincrement())
+  nama             String
+  namaEn           String?
+  kategori         String   // Pantai, Air Terjun, Alam, Petualangan, Edukasi, Taman Kota
+  lokasi           String
+  lat              Float
+  lng              Float
+  deskripsi        String
+  deskripsiEn      String?
+  hargaTiket       Int
+  rating           Float    @default(4.5)
+  fasilitas        String   // Disimpan sebagai JSON string array: ["Spot Foto", "Area Parkir", ...]
+  gambar           String
+  galeri           String   // Disimpan sebagai JSON string array URL gambar
+  rekomendasi      Boolean  @default(false)
+  audioDeskripsiId String?
+  audioDeskripsiEn String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  reviews          Review[]
+}
+
+// 2. Model Kuliner & Oleh-Oleh Khas Tanggamus
+model Culinary {
+  id                Int      @id @default(autoincrement())
+  nama              String
+  namaEn            String?
+  kategori          String   // Makanan Utama, Tradisional, Minuman, Oleh-Oleh, Manisan Tradisional
+  kategoriEn        String?
+  deskripsi         String
+  deskripsiEn       String?
+  hargaEstimasi     String
+  lokasiRekomendasi String
+  gambar            String
+  badge             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// 3. Model Panduan Rute Transportasi
+model Transportation {
+  id            Int      @id @default(autoincrement())
+  asal          String
+  asalEn        String?
+  jarak         String
+  waktu         String
+  rute          String
+  opsi          String   // JSON string array opsi kendaraan
+  biayaEstimasi String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+// 4. Model Kontak Darurat Wisata (Emergency SOS)
+model EmergencyContact {
+  id        Int      @id @default(autoincrement())
+  instansi  String
+  nomor     String
+  layanan   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// 5. Model Ulasan / Review Pengunjung
+model Review {
+  id            Int         @id @default(autoincrement())
+  destinationId Int
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  authorName    String
+  rating        Float       @default(5.0)
+  comment       String
+  origin        String?     @default("Wisatawan")
+  createdAt     DateTime    @default(now())
+}
+
+// 6. Model Rencana Perjalanan & Estimasi Budget (Trip Budget Planner)
+model TripPlan {
+  id                   Int      @id @default(autoincrement())
+  planCode             String   @unique // Contoh: TGG-72183
+  travelerName         String?  @default("Wisatawan")
+  travelersCount       Int      @default(2)
+  durationDays         Int      @default(2)
+  transportType        String   @default("car_rental")
+  accommodationType    String   @default("homestay")
+  mealTier             String   @default("standard")
+  selectedDestinations String   // JSON string array nama destinasi
+  ticketCost           Int      @default(0)
+  transportCost        Int      @default(0)
+  accommodationCost    Int      @default(0)
+  mealCost             Int      @default(0)
+  totalCost            Int      @default(0)
+  costPerPerson        Int      @default(0)
+  createdAt            DateTime @default(now())
+}
+
+// 7. Model Leaderboard Mini Game (Mengetik, Kuis, Penjaga Laut)
+model GameScore {
+  id         Int      @id @default(autoincrement())
+  playerName String   @default("Anonim")
+  gameType   String   // TYPING, QUIZ, SHOOTER
+  score      Int      @default(0)
+  detail     String?  // WPM, akurasi, combo, dll
+  createdAt  DateTime @default(now())
+}

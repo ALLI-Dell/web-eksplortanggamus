@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'SEWA AJA — Persewaan Busana SMK Telkom' %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>👘</text></svg>">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo">
+        <div class="brand-icon">👘</div>
+        <div class="brand-text">
+          <h1>SEWA AJA</h1>
+          <span>Manajemen Busana • SMK Telkom Lampung</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li>
+          <a href="/" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">
+            📊 Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="/items" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'items' ? 'active' : '' %>">
+            👗 Cek Barang (Katalog)
+          </a>
+        </li>
+        <li>
+          <a href="/rentals" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'rentals' ? 'active' : '' %>">
+            📋 Cek Sewaan
+          </a>
+        </li>
+        <li>
+          <a href="/rentals/new" class="nav-link nav-cta">
+            ➕ Transaksi Sewa Baru
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-status">
+        <span class="status-dot"></span>
+        <span>EJS + SQLite (Aktif)</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Wrapper -->
+  <main class="main-content">
+    <div class="container">

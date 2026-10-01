@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eksplor Tanggamus - Surga Wisata Alam, Bahari & Kuliner Lampung</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta name="description" content="Portal panduan wisata terlengkap Kabupaten Tanggamus, Lampung. Jelajahi Pantai Gigi Hiu, Teluk Kiluan, Way Lalaan, kuliner khas, rute transportasi, dan estimasi biaya liburan.">
+    <meta name="keywords" content="Wisata Tanggamus, Pantai Gigi Hiu, Teluk Kiluan, Air Terjun Way Lalaan, Pariwisata Lampung, Kuliner Tanggamus, Rute Tanggamus">
+    <meta name="author" content="Dinas Pariwisata Tanggamus / Eksplor Tanggamus">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://eksplortanggamus.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:site_name" content="Eksplor Tanggamus">
+    <meta property="og:title" content="Eksplor Tanggamus - Surga Wisata Alam, Bahari & Kuliner Lampung">
+    <meta property="og:description" content="Panduan destinasi wisata, kuliner, rute perjalanan, dan kalkulator liburan terlengkap di Kabupaten Tanggamus.">
+    <meta property="og:image" content="Gambar/kiluan.jpg">
+    <meta property="og:url" content="https://eksplortanggamus.com/">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Eksplor Tanggamus - Surga Wisata Alam, Bahari & Kuliner Lampung">
+    <meta name="twitter:description" content="Panduan destinasi wisata, kuliner, dan rute perjalanan terlengkap di Tanggamus.">
+    <meta name="theme-color" content="#0284c7">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet.js Interactive Map CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Scroll Progress Bar -->
+    <div id="scrollProgressBar" class="scroll-progress-bar"></div>
+
+    <canvas id="waterCanvas" class="water-canvas"></canvas>
+    <div id="cursorDot" class="cursor-dot"></div>
+    <div id="cursorRing" class="cursor-ring"></div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Full-Page Loading Screen -->
+    <div id="preloader" class="preloader" aria-hidden="false">
+        <div class="preloader-content">
+            <div class="preloader-icon-wrap">
+                <i class="fa-solid fa-compass fa-spin-pulse"></i>
+            </div>
+            <h2 class="preloader-title">Eksplor Tanggamus</h2>
+            <p class="preloader-subtitle" data-i18n="preloader_sub">Memuat Keindahan Alam & Kuliner Lampung...</p>
+            <div class="preloader-bar"><div class="preloader-progress"></div></div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <nav class="navbar" role="navigation" aria-label="Navigasi Utama">
+        <div class="container nav-container">
+            <a href="#" class="nav-logo" aria-label="Eksplor Tanggamus Home">
+                <i class="fa-solid fa-compass"></i>
+                <span>Eksplor Tanggamus</span>
+            </a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#beranda" class="nav-link active"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Beranda</span></a></li>
+                <li><a href="#destinasi" class="nav-link"><i class="fa-solid fa-location-dot"></i> <span data-i18n="nav_dest">Destinasi</span></a></li>
+                <li><a href="#kuliner" class="nav-link"><i class="fa-solid fa-utensils"></i> <span data-i18n="nav_culinary">Kuliner</span></a></li>
+                <li><a href="#kalkulator" class="nav-link"><i class="fa-solid fa-calculator"></i> <span data-i18n="nav_budget">Estimasi Biaya</span></a></li>
+                <li><a href="#transportasi" class="nav-link"><i class="fa-solid fa-route"></i> <span data-i18n="nav_route">Rute</span></a></li>
+                <li><a href="#peta" class="nav-link"><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="nav_map">Peta</span></a></li>
+                <li><a href="/dashboard" class="nav-link" target="_blank" title="Database Management Center"><i class="fa-solid fa-database"></i> <span>Database</span></a></li>
+            </ul>
+            <div class="nav-actions">
+                <!-- Language Switcher Button -->
+                <button class="btn-lang" id="btnLangToggle" title="Ganti Bahasa / Switch Language" aria-label="Switch Language">
+                    <span id="langFlag">🇮🇩</span> <span id="langText">ID</span>
+                </button>
+
+                <!-- Compare Modal Trigger -->
+                <button class="btn-icon btn-nav-tool" id="btnCompareNav" title="Bandingkan Destinasi" aria-label="Bandingkan Destinasi">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </button>
+
+                <!-- Emergency SOS Trigger -->
+                <button class="btn-icon btn-sos" id="btnEmergencySOS" title="Kontak Darurat Wisata (SOS)" aria-label="Kontak Darurat">
+                    <i class="fa-solid fa-phone-volume"></i>
+                    <span class="sos-pulse-ring"></span>
+                </button>
+
+                <!-- Game Launcher Button -->
+                <button class="btn-icon btn-game-launcher" id="btnGameLauncher" title="Pilih & Mainkan Mini Game" aria-label="Buka Menu Mini Game">
+                    <i class="fa-solid fa-gamepad"></i>
+                </button>
+
+                <!-- Game Selector Dropdown -->
+                <div class="game-dropdown" id="gameDropdown">
+                    <button class="game-dropdown-item" id="btnTypingGame">
+                        <i class="fa-solid fa-keyboard"></i>
+                        <div>
+                            <strong data-i18n="game1_title">Belajar Mengetik</strong>
+                            <span data-i18n="game1_sub">Latih kecepatan mengetik Bahasa Indonesia</span>
+                        </div>
+                    </button>
+                    <button class="game-dropdown-item" id="btnQuizGame">
+                        <i class="fa-solid fa-question-circle"></i>
+                        <div>
+                            <strong data-i18n="game2_title">Tebak-Tebakan Wisata</strong>
+                            <span data-i18n="game2_sub">Uji pengetahuanmu tentang Tanggamus</span>
+                        </div>
+                    </button>
+                    <button class="game-dropdown-item" id="btnShooterGame">
+                        <i class="fa-solid fa-crosshairs" style="color:#ef4444;"></i>
+                        <div>
+                            <strong data-i18n="game3_title">Penjaga Laut Tanggamus</strong>
+                            <span data-i18n="game3_sub">Tembak sampah & amankan Teluk Kiluan!</span>
+                        </div>
+                    </button>
+                </div>
+
+                <button class="btn-icon" id="btnFavoritesTab" title="Destinasi Favorit Saya" aria-label="Lihat Destinasi Favorit">
+                    <i class="fa-solid fa-heart"></i>
+                    <span class="badge-count" id="favBadgeCount" aria-live="polite">0</span>
+                </button>
+                <button class="btn-icon" id="themeToggleBtn" title="Ganti Mode Gelap/Terang" aria-label="Toggle Dark Mode">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="nav-toggle" id="navToggle" aria-label="Buka Menu Navigasi" aria-expanded="false">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <!-- Ultra-small screen: Tools overflow button (< 380px) -->
+                <button class="btn-icon btn-nav-tools-overflow" id="btnNavToolsOverflow" title="Peralatan Navigasi" aria-label="Buka Menu Peralatan" aria-expanded="false">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <!-- Tools overflow dropdown panel -->
+                <div class="nav-tools-overflow-panel" id="navToolsOverflowPanel" role="menu" aria-label="Menu Peralatan">
+                    <div class="ntop-item" id="ntop-lang" role="menuitem" tabindex="0">
+                        <span class="ntop-icon"><span id="ntopLangFlag">🇮🇩</span></span>
+                        <span class="ntop-label">Bahasa / Language</span>
+                    </div>
+                    <div class="ntop-item" id="ntop-compare" role="menuitem" tabindex="0">
+                        <span class="ntop-icon"><i class="fa-solid fa-scale-balanced"></i></span>
+                        <span class="ntop-label">Bandingkan Destinasi</span>
+                    </div>
+                    <div class="ntop-item" id="ntop-sos" role="menuitem" tabindex="0">
+                        <span class="ntop-icon" style="color:#ef4444;"><i class="fa-solid fa-phone-volume"></i></span>
+                        <span class="ntop-label">Kontak Darurat (SOS)</span>
+                    </div>
+                    <div class="ntop-item" id="ntop-game" role="menuitem" tabindex="0">
+                        <span class="ntop-icon"><i class="fa-solid fa-gamepad"></i></span>
+                        <span class="ntop-label">Mini Game</span>
+                    </div>
+                    <div class="ntop-item" id="ntop-fav" role="menuitem" tabindex="0">
+                        <span class="ntop-icon" style="color:#ef4444;"><i class="fa-solid fa-heart"></i></span>
+                        <span class="ntop-label">Destinasi Favorit</span>
+                    </div>
+                    <div class="ntop-item" id="ntop-theme" role="menuitem" tabindex="0">
+                        <span class="ntop-icon"><i class="fa-solid fa-moon" id="ntopThemeIcon"></i></span>
+                        <span class="ntop-label">Mode Gelap / Terang</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <header class="hero" id="beranda" role="banner">
+        <!-- Hero Live Background Video Layer -->
+        <div class="hero-bg-video-wrap">
+            <video id="heroVideo" class="hero-bg-mp4" autoplay loop muted playsinline poster="Gambar/kiluan.jpg">
+                <source src="video.mp4" type="video/mp4">
+            </video>
+            <div class="hero-bg-video-overlay"></div>
+            <button id="btnToggleHeroVideo" class="btn-hero-video-toggle" title="Jeda / Putar Video Latar" aria-label="Toggle Video Play Pause">
+                <i class="fa-solid fa-pause"></i> <span id="vtoggleText" data-i18n="video_pause">Jeda Video</span>
+            </button>
+        </div>
+
+        <div class="hero-glow-orb hero-glow-orb-1"></div>
+        <div class="hero-glow-orb hero-glow-orb-2"></div>
+
+        <div class="container hero-content">
+            <div class="hero-badge animate-badge">
+                <i class="fa-solid fa-sparkles"></i> <span data-i18n="hero_badge">Wisata Bahari & Alam Pilihan Lampung</span>
+            </div>
+            <h1 class="hero-title animate-title"><span data-i18n="hero_title_1">Jelajahi Keindahan</span> <span class="shimmer-text">Tanggamus</span> <span data-i18n="hero_title_2">yang Menakjubkan</span></h1>
+            <p class="hero-subtitle animate-fade-in" data-i18n="hero_subtitle">Dari pesona surga lumba-lumba Teluk Kiluan hingga tebing batu karang Pantai Gigi Hiu. Temukan pengalaman wisata, kuliner, dan budaya tak terlupakan di setiap sudutnya.</p>
+            
+            <!-- Hero Call-To-Action (CTA) Buttons -->
+            <div class="hero-cta-group animate-fade-up">
+                <a href="#destinasi" class="btn-hero-primary">
+                    <i class="fa-solid fa-compass"></i> <span data-i18n="hero_cta_explore">Jelajahi Destinasi</span>
+                </a>
+                <a href="#kalkulator" class="btn-hero-secondary">
+                    <i class="fa-solid fa-calculator"></i> <span data-i18n="hero_cta_budget">Hitung Biaya Liburan</span>
+                </a>
+            </div>
+
+            <div class="hero-stats animate-fade-up">
+                <div class="stat-item">
+                    <h4 id="statTotalDestinasi" data-target="10">0+</h4>
+                    <p data-i18n="stat_dest">Destinasi Pilihan</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="statRating" data-target="4.8">0.0 ★</h4>
+                    <p data-i18n="stat_rating">Rating Rata-Rata</p>
+                </div>
+                <div class="stat-item">
+                    <h4 id="statAsri" data-target="100">0%</h4>
+                    <p data-i18n="stat_asri">Keindahan Alam Asri</p>
+                </div>
+            </div>
+
+            <!-- Mini Weather Widget in Hero -->
+            <div class="hero-weather-mini animate-bounce-gentle" id="heroWeatherMini">
+                <span class="hwm-loading"><i class="fa-solid fa-spinner fa-spin"></i> <span data-i18n="weather_loading">Memuat cuaca...</span></span>
+            </div>
+        </div>
+
+        <!-- Animated Ocean Wave Divider -->
+        <div class="hero-waves-divider">
+            <svg class="waves" xmlns="http://www.w3.org/2000/svg" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+                <defs>
+                    <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+                </defs>
+                <g class="parallax-waves">
+                    <use href="#gentle-wave" x="48" y="0" fill="rgba(56, 189, 248, 0.25)" />
+                    <use href="#gentle-wave" x="48" y="3" fill="rgba(16, 185, 129, 0.2)" />
+                    <use href="#gentle-wave" x="48" y="5" fill="rgba(2, 132, 199, 0.35)" />
+                    <use href="#gentle-wave" x="48" y="7" fill="var(--bg-main)" />
+                </g>
+            </svg>
+        </div>
+    </header>
+
+    <!-- ===== REAL-TIME WEATHER SECTION ===== -->
+    <section class="weather-section reveal-on-scroll" id="cuaca" aria-label="Cuaca Tanggamus Real-Time">
+        <div class="container">
+            <div class="weather-card" id="weatherCard">
+
+                <!-- Loading State -->
+                <div class="weather-loading" id="weatherLoading">
+                    <i class="fa-solid fa-cloud-sun fa-beat-fade weather-load-icon"></i>
+                    <p data-i18n="weather_fetch">Mengambil data cuaca Tanggamus...</p>
+                </div>
+
+                <!-- Weather Content (filled by JS) -->
+                <div class="weather-content" id="weatherContent" style="display:none;">
+
+                    <!-- Left: Main Weather -->
+                    <div class="weather-main">
+                        <div class="weather-location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <select id="weatherDistrictSelect" class="weather-district-select" aria-label="Pilih Lokasi Kecamatan Tanggamus">
+                                <option value="kota_agung">Kota Agung (Pusat)</option>
+                                <option value="gisting">Gisting (Pegunungan)</option>
+                                <option value="kelumbayan">Kelumbayan (Kiluan & Gigi Hiu)</option>
+                                <option value="ulubelu">Ulubelu (Lembah Pelangi)</option>
+                                <option value="air_naningan">Air Naningan (Batutegi)</option>
+                            </select>
+                        </div>
+                        <div class="weather-primary">
+                            <div class="weather-icon-big" id="wIconBig">🌤️</div>
+                            <div class="weather-temp-wrap">
+                                <h2 class="weather-temp" id="wTemp">--°C</h2>
+                                <p class="weather-condition" id="wCondition">Memuat...</p>
+                                <p class="weather-feels" id="wFeels">Terasa seperti --°C</p>
+                            </div>
+                        </div>
+                        <div class="weather-update-time">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                            <span id="wUpdateTime">Memperbarui...</span>
+                            <button class="btn-refresh-weather" id="btnRefreshWeather" title="Perbarui Data Cuaca" aria-label="Perbarui cuaca">
+                                <i class="fa-solid fa-rotate-right"></i> <span data-i18n="btn_refresh">Perbarui</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: Detail Stats -->
+                    <div class="weather-details">
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-droplet"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_humidity">Kelembapan</span>
+                                <span class="wdetail-val" id="wHumidity">--%</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-wind"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_wind">Kecepatan Angin</span>
+                                <span class="wdetail-val" id="wWind">-- km/j</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-cloud-rain"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_rain">Curah Hujan 1j</span>
+                                <span class="wdetail-val" id="wRain">-- mm</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-eye"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_visibility">Visibilitas</span>
+                                <span class="wdetail-val" id="wVisibility">-- km</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-sun"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_uv">UV Index</span>
+                                <span class="wdetail-val" id="wUV">--</span>
+                            </div>
+                        </div>
+                        <div class="weather-detail-item">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <div>
+                                <span class="wdetail-label" data-i18n="w_pressure">Tekanan Udara</span>
+                                <span class="wdetail-val" id="wPressure">-- hPa</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom: Wisata Recommendation -->
+                    <div class="weather-rekomendasi" id="wRekomendasi">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <span id="wRekomendasiText">Memuat rekomendasi...</span>
+                    </div>
+
+                    <!-- Hourly Forecast Strip -->
+                    <div class="weather-forecast-strip">
+                        <h4 class="forecast-title"><i class="fa-solid fa-clock"></i> <span data-i18n="w_forecast">Prakiraan 6 Jam Ke Depan</span></h4>
+                        <div class="forecast-items" id="forecastItems"></div>
+                    </div>
+                </div>
+
+                <!-- Error State -->
+                <div class="weather-error" id="weatherError" style="display:none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <p id="weatherErrorMsg">Gagal memuat data cuaca.</p>
+                    <button class="btn-refresh-weather" id="btnRetryWeather">Coba Lagi</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Destination Content -->
+    <main class="container" id="destinasi" role="main">
+        <section class="controls-wrapper reveal-on-scroll">
+            <div class="controls-card">
+                <div class="search-sort-bar" role="search">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon-active"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cari tempat wisata, lokasi, atau fasilitas..." aria-label="Input pencarian" data-i18n-placeholder="search_placeholder">
+                        <span class="search-kbd-hint" title="Tekan / untuk fokus">/</span>
+                        <button class="search-clear" id="searchClearBtn" aria-label="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div class="sort-box">
+                        <label for="sortSelect"><i class="fa-solid fa-arrow-down-wide-short"></i> <span data-i18n="sort_label">Urutkan:</span></label>
+                        <select id="sortSelect" class="select-custom" aria-label="Urutkan destinasi">
+                            <option value="default" data-i18n="sort_recom">Rekomendasi</option>
+                            <option value="rating-desc" data-i18n="sort_rating">Rating Tertinggi ⭐</option>
+                            <option value="price-asc" data-i18n="sort_price_low">Harga: Termurah ➔ Termahal</option>
+                            <option value="price-desc" data-i18n="sort_price_high">Harga: Termahal ➔ Termurah</option>
+                            <option value="name-asc" data-i18n="sort_name">Nama (A - Z)</option>
+                        </select>
+                    </div>
+                    <div class="sort-box">
+                        <label for="priceSelect"><i class="fa-solid fa-tag"></i> <span data-i18n="filter_price_label">Harga:</span></label>
+                        <select id="priceSelect" class="select-custom" aria-label="Filter harga tiket">
+                            <option value="all" data-i18n="price_all">Semua Harga</option>
+                            <option value="10000" data-i18n="price_10k">≤ Rp 10.000 (Hemat)</option>
+                            <option value="15000" data-i18n="price_15k">≤ Rp 15.000</option>
+                            <option value="20000" data-i18n="price_20k">≤ Rp 20.000</option>
+                        </select>
+                    </div>
+                    <div class="sort-box">
+                        <label for="ratingSelect"><i class="fa-solid fa-star"></i> <span data-i18n="filter_rating_label">Rating:</span></label>
+                        <select id="ratingSelect" class="select-custom" aria-label="Filter rating minimum">
+                            <option value="all" data-i18n="rating_all">Semua Rating</option>
+                            <option value="4.5" data-i18n="rating_45">⭐ 4.5+</option>
+                            <option value="4.7" data-i18n="rating_47">⭐ 4.7+ (Top)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="filter-tabs-row">
+                    <div class="category-pills" role="tablist" aria-label="Kategori Wisata">
+                        <button class="btn-pill active" data-category="Semua" role="tab" aria-selected="true"><i class="fa-solid fa-layer-group"></i> <span data-i18n="cat_all">Semua</span></button>
+                        <button class="btn-pill" data-category="Pantai" role="tab" aria-selected="false"><i class="fa-solid fa-umbrella-beach"></i> <span data-i18n="cat_beach">Pantai</span></button>
+                        <button class="btn-pill" data-category="Air Terjun" role="tab" aria-selected="false"><i class="fa-solid fa-water"></i> <span data-i18n="cat_waterfall">Air Terjun</span></button>
+                        <button class="btn-pill" data-category="Alam" role="tab" aria-selected="false"><i class="fa-solid fa-tree"></i> <span data-i18n="cat_nature">Alam</span></button>
+                        <button class="btn-pill" data-category="Petualangan" role="tab" aria-selected="false"><i class="fa-solid fa-person-hiking"></i> <span data-i18n="cat_adventure">Petualangan</span></button>
+                        <button class="btn-pill" data-category="Edukasi" role="tab" aria-selected="false"><i class="fa-solid fa-graduation-cap"></i> <span data-i18n="cat_education">Edukasi</span></button>
+                        <button class="btn-pill" data-category="Taman Kota" role="tab" aria-selected="false"><i class="fa-solid fa-city"></i> <span data-i18n="cat_park">Taman Kota</span></button>
+                    </div>
+                    <div class="view-mode-toggles">
+                        <button class="btn-view-toggle active" id="btnViewAll"><i class="fa-solid fa-border-all"></i> <span data-i18n="view_all">Semua Destinasi</span></button>
+                        <button class="btn-view-toggle" id="btnViewFavOnly"><i class="fa-solid fa-heart" style="color:#ef4444;"></i> <span data-i18n="view_fav">Favorit Saya</span></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="results-header reveal-on-scroll">
+            <h2 class="results-title" id="resultsTitle" data-i18n="results_title">Daftar Destinasi Wisata</h2>
+            <span class="results-count" id="resultsCount" aria-live="polite">Menampilkan 0 destinasi</span>
+        </div>
+        <div id="destinasi-list" class="grid-container" aria-live="polite"></div>
+    </main>
+
+    <!-- ===== SECTION: KULINER & OLEH-OLEH KHAS TANGGAMUS ===== -->
+    <section class="culinary-section reveal-on-scroll" id="kuliner">
+        <div class="container">
+            <div class="section-header-wrap">
+                <span class="section-tag"><i class="fa-solid fa-utensils"></i> <span data-i18n="culinary_tag">Cita Rasa Khas Pesisir & Pegunungan</span></span>
+                <h2 class="section-title"><span data-i18n="culinary_title_1">Eksplorasi Kuliner &</span> <span class="shimmer-text" data-i18n="culinary_title_2">Oleh-Oleh Khas</span></h2>
+                <p class="section-subtitle" data-i18n="culinary_subtitle">Nikmati kelezatan warisan kuliner autentik Tanggamus dari gulai ikan tuhuk hingga keharuman kopi Robusta Ulubelu.</p>
+            </div>
+
+            <div class="culinary-filter-pills" role="tablist">
+                <button class="btn-pill-culinary active" data-cul-category="Semua"><i class="fa-solid fa-utensils"></i> <span data-i18n="cul_all">Semua Kuliner</span></button>
+                <button class="btn-pill-culinary" data-cul-category="Makanan Utama"><i class="fa-solid fa-bowl-food"></i> <span data-i18n="cul_main">Makanan Utama</span></button>
+                <button class="btn-pill-culinary" data-cul-category="Tradisional"><i class="fa-solid fa-pepper-hot"></i> <span data-i18n="cul_trad">Tradisional</span></button>
+                <button class="btn-pill-culinary" data-cul-category="Minuman"><i class="fa-solid fa-mug-hot"></i> <span data-i18n="cul_drink">Kopi & Minuman</span></button>
+                <button class="btn-pill-culinary" data-cul-category="Oleh-Oleh"><i class="fa-solid fa-bag-shopping"></i> <span data-i18n="cul_souvenir">Oleh-Oleh</span></button>
+            </div>
+
+            <div id="kulinerList" class="culinary-grid"></div>
+        </div>
+    </section>
+
+    <!-- ===== SECTION: KALKULATOR ESTIMASI BIAYA WISATA (TRIP BUDGET PLANNER) ===== -->
+    <section class="budget-section reveal-on-scroll" id="kalkulator">
+        <div class="container">
+            <div class="section-header-wrap">
+                <span class="section-tag"><i class="fa-solid fa-calculator"></i> <span data-i18n="budget_tag">Trip Budget Planner</span></span>
+                <h2 class="section-title"><span data-i18n="budget_title_1">Kalkulator Estimasi</span> <span class="shimmer-text" data-i18n="budget_title_2">Biaya Liburan</span></h2>
+                <p class="section-subtitle" data-i18n="budget_subtitle">Rencanakan anggaran liburan Anda ke Tanggamus dengan mudah dan transparan.</p>
+            </div>
+
+            <div class="budget-planner-card">
+                <!-- Left: Interactive Inputs -->
+                <div class="budget-inputs-col">
+                    <!-- Step 1: Destination Selection -->
+                    <div class="budget-group">
+                        <label class="budget-label"><i class="fa-solid fa-map-pin"></i> <span data-i18n="bp_dest_label">Pilih Destinasi Tujuan (Tur Keliling / Multi-Select):</span></label>
+                        <div class="budget-dest-selector" id="budgetDestSelector">
+                            <!-- Injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Travelers & Days -->
+                    <div class="budget-row-grid">
+                        <div class="budget-group">
+                            <label class="budget-label" for="budgetTravelers"><i class="fa-solid fa-users"></i> <span data-i18n="bp_travelers">Jumlah Wisatawan:</span></label>
+                            <div class="counter-input-wrap">
+                                <button type="button" class="btn-counter" id="btnMinusTravelers">-</button>
+                                <input type="number" id="budgetTravelers" value="2" min="1" max="50" readonly>
+                                <button type="button" class="btn-counter" id="btnPlusTravelers">+</button>
+                                <span class="counter-unit" data-i18n="bp_people">Orang</span>
+                            </div>
+                        </div>
+
+                        <div class="budget-group">
+                            <label class="budget-label" for="budgetDays"><i class="fa-solid fa-calendar-days"></i> <span data-i18n="bp_days">Durasi Liburan:</span></label>
+                            <div class="counter-input-wrap">
+                                <button type="button" class="btn-counter" id="btnMinusDays">-</button>
+                                <input type="number" id="budgetDays" value="2" min="1" max="14" readonly>
+                                <button type="button" class="btn-counter" id="btnPlusDays">+</button>
+                                <span class="counter-unit" data-i18n="bp_day_unit">Hari</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Transport Options -->
+                    <div class="budget-group">
+                        <label class="budget-label"><i class="fa-solid fa-car"></i> <span data-i18n="bp_trans_label">Moda Transportasi:</span></label>
+                        <div class="budget-radio-cards" id="budgetTransportOptions">
+                            <label class="budget-radio-card active">
+                                <input type="radio" name="budgetTransport" value="car_rental" checked>
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-van-shuttle"></i>
+                                    <div>
+                                        <strong data-i18n="trans_rental">Sewa Mobil + Supir</strong>
+                                        <span data-i18n="trans_rental_p">Rp 500.000 / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetTransport" value="personal_car">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-car-side"></i>
+                                    <div>
+                                        <strong data-i18n="trans_personal">Mobil Pribadi (BBM/Tol)</strong>
+                                        <span data-i18n="trans_personal_p">Rp 200.000 / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetTransport" value="motorcycle">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-motorcycle"></i>
+                                    <div>
+                                        <strong data-i18n="trans_motor">Motor (BBM)</strong>
+                                        <span data-i18n="trans_motor_p">Rp 60.000 / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetTransport" value="travel_public">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-bus"></i>
+                                    <div>
+                                        <strong data-i18n="trans_public">Travel Eksekutif</strong>
+                                        <span data-i18n="trans_public_p">Rp 80.000 / orang</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Accommodation Options -->
+                    <div class="budget-group">
+                        <label class="budget-label"><i class="fa-solid fa-bed"></i> <span data-i18n="bp_hotel_label">Tipe Penginapan:</span></label>
+                        <div class="budget-radio-cards" id="budgetHotelOptions">
+                            <label class="budget-radio-card active">
+                                <input type="radio" name="budgetHotel" value="homestay" checked>
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-house-chimney-user"></i>
+                                    <div>
+                                        <strong data-i18n="hotel_homestay">Homestay / Villa Kiluan</strong>
+                                        <span data-i18n="hotel_homestay_p">Rp 300.000 / malam</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetHotel" value="standard_hotel">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-hotel"></i>
+                                    <div>
+                                        <strong data-i18n="hotel_standard">Hotel / Resort Gisting</strong>
+                                        <span data-i18n="hotel_standard_p">Rp 500.000 / malam</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetHotel" value="camping">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-campground"></i>
+                                    <div>
+                                        <strong data-i18n="hotel_camp">Camping Tenda Alami</strong>
+                                        <span data-i18n="hotel_camp_p">Rp 75.000 / malam</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetHotel" value="none">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-ban"></i>
+                                    <div>
+                                        <strong data-i18n="hotel_none">Tanpa Menginap (PP)</strong>
+                                        <span>Rp 0</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Step 5: Meal Budget Tier -->
+                    <div class="budget-group">
+                        <label class="budget-label"><i class="fa-solid fa-utensils"></i> <span data-i18n="bp_meal_label">Paket Konsumsi / Makan:</span></label>
+                        <div class="budget-radio-cards" id="budgetMealOptions">
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetMeal" value="budget">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-bowl-rice"></i>
+                                    <div>
+                                        <strong data-i18n="meal_budget">Hemat (Warung Lokal)</strong>
+                                        <span>Rp 60.000 / org / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card active">
+                                <input type="radio" name="budgetMeal" value="standard" checked>
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-utensils"></i>
+                                    <div>
+                                        <strong data-i18n="meal_standard">Standar (Resto & Kuliner)</strong>
+                                        <span>Rp 120.000 / org / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="budget-radio-card">
+                                <input type="radio" name="budgetMeal" value="seafood">
+                                <div class="radio-content">
+                                    <i class="fa-solid fa-fish-fins"></i>
+                                    <div>
+                                        <strong data-i18n="meal_seafood">Pesta Seafood & Seruit</strong>
+                                        <span>Rp 200.000 / org / hari</span>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Receipt Breakdown -->
+                <div class="budget-receipt-col">
+                    <div class="receipt-card">
+                        <div class="receipt-header">
+                            <i class="fa-solid fa-receipt"></i>
+                            <h3 data-i18n="receipt_title">Ringkasan Estimasi Biaya</h3>
+                            <span class="receipt-subtitle" data-i18n="receipt_sub">Estimasi transparan liburan Tanggamus</span>
+                        </div>
+
+                        <div class="receipt-breakdown">
+                            <div class="receipt-row-dests">
+                                <span class="r-label"><i class="fa-solid fa-map-location-dot"></i> <strong id="receiptDestCount">0 Destinasi Dipilih:</strong></span>
+                                <div class="receipt-dests-wrap" id="receiptSelectedDests"></div>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="r-label"><i class="fa-solid fa-ticket"></i> <span data-i18n="r_tickets">Tiket Masuk Wisata</span></span>
+                                <span class="r-val" id="receiptTickets">Rp 0</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="r-label"><i class="fa-solid fa-car"></i> <span data-i18n="r_transport">Transportasi</span></span>
+                                <span class="r-val" id="receiptTransport">Rp 0</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="r-label"><i class="fa-solid fa-bed"></i> <span data-i18n="r_hotel">Akomodasi / Penginapan</span></span>
+                                <span class="r-val" id="receiptHotel">Rp 0</span>
+                            </div>
+                            <div class="receipt-row">
+                                <span class="r-label"><i class="fa-solid fa-utensils"></i> <span data-i18n="r_meal">Konsumsi & Kuliner</span></span>
+                                <span class="r-val" id="receiptMeal">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <div class="receipt-divider"></div>
+
+                        <div class="receipt-total-box">
+                            <span class="total-label" data-i18n="total_estimate">TOTAL ESTIMASI BIAYA</span>
+                            <h2 class="total-price" id="receiptTotalPrice">Rp 0</h2>
+                            <span class="per-person-text" id="receiptPerPerson">Rp 0 / orang</span>
+                        </div>
+
+                        <div class="receipt-actions">
+                            <button class="btn-action-primary" id="btnSaveBudgetDB" style="background:#10b981; border-color:#10b981;">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> <span>Simpan ke Database</span>
+                            </button>
+                            <button class="btn-action-primary" id="btnPrintBudget">
+                                <i class="fa-solid fa-print"></i> <span data-i18n="btn_print_plan">Cetak Rencana</span>
+                            </button>
+                            <button class="btn-action-secondary" id="btnShareBudgetWA">
+                                <i class="fa-brands fa-whatsapp" style="color:#25D366;font-size:1.1rem;"></i> <span data-i18n="btn_share_plan">Kirim ke WhatsApp</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECTION: PANDUAN TRANSPORTASI & RUTE ===== -->
+    <section class="transport-section reveal-on-scroll" id="transportasi">
+        <div class="container">
+            <div class="section-header-wrap">
+                <span class="section-tag"><i class="fa-solid fa-route"></i> <span data-i18n="route_tag">Panduan Akses Wisatawan</span></span>
+                <h2 class="section-title"><span data-i18n="route_title_1">Rute & Panduan</span> <span class="shimmer-text" data-i18n="route_title_2">Transportasi</span></h2>
+                <p class="section-subtitle" data-i18n="route_subtitle">Petunjuk rute lengkap menuju Kabupaten Tanggamus dari berbagai gerbang kedatangan.</p>
+            </div>
+
+            <div class="transport-grid" id="transportGrid">
+                <!-- Injected by JS -->
+            </div>
+
+            <div class="transport-tips-card reveal-on-scroll">
+                <div class="tips-icon"><i class="fa-solid fa-lightbulb"></i></div>
+                <div class="tips-content">
+                    <h4 data-i18n="tips_title">Tips Perjalanan Nyaman ke Tanggamus</h4>
+                    <ul class="tips-list">
+                        <li data-i18n="tips_1"><strong>Waktu Terbaik:</strong> Berangkat pagi (06.00 - 08.00 WIB) untuk menghindari kepadatan di Pasar Pringsewu & Gisting.</li>
+                        <li data-i18n="tips_2"><strong>Jalur Menuju Kiluan & Gigi Hiu:</strong> Disarankan menggunakan kendaraan roda 4 berpenggerak tinggi / motor bertenaga prima karena medan perbukitan berbatu.</li>
+                        <li data-i18n="tips_3"><strong>BBM & SPBU:</strong> SPBU 24 Jam tersedia di sepanjang Jalinbar (Pringsewu, Talang Padang, Gisting, Kota Agung).</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="explore-map-section reveal-on-scroll" id="peta">
+        <div class="container">
+            <div class="map-card">
+                <div class="map-card-text">
+                    <h2><i class="fa-solid fa-map-location-dot"></i> <span data-i18n="map_section_title">Peta Interaktif Wisata & Kuliner Tanggamus</span></h2>
+                    <p data-i18n="map_section_desc">Jelajahi sebaran lokasi destinasi alam, bahari, air terjun, dan rekomendasi tempat kuliner di Tanggamus secara langsung pada peta interaktif di bawah ini. Klik marker untuk melihat info detail.</p>
+                    <div class="map-filter-bar" id="mapFilterBar">
+                        <button class="map-filter-btn active" data-mapcat="all"><i class="fa-solid fa-layer-group"></i> Semua Spot</button>
+                        <button class="map-filter-btn" data-mapcat="Pantai"><i class="fa-solid fa-umbrella-beach"></i> Pantai</button>
+                        <button class="map-filter-btn" data-mapcat="Air Terjun"><i class="fa-solid fa-water"></i> Air Terjun</button>
+                        <button class="map-filter-btn" data-mapcat="Alam"><i class="fa-solid fa-mountain-sun"></i> Alam & Gunung</button>
+                        <button class="map-filter-btn" data-mapcat="Kuliner"><i class="fa-solid fa-utensils"></i> Kuliner</button>
+                    </div>
+                </div>
+                <div class="map-leaflet-container">
+                    <div id="interactiveMap" style="width:100%; height:480px; border-radius:var(--radius-md); box-shadow:var(--shadow-lg); z-index:1;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =====================================================
+         MODAL 1: Detail Destinasi (with Audio Guide & Reviews)
+    ====================================================== -->
+    <div id="detailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-content modal-detail-enhanced">
+            <button class="modal-close-btn" id="modalCloseBtn" aria-label="Tutup Detail"><i class="fa-solid fa-xmark"></i></button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL 2: Bandingkan Destinasi (Compare Destinations)
+    ====================================================== -->
+    <div id="compareModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+        <div class="modal-content modal-compare-content">
+            <button class="modal-close-btn" id="compareCloseBtn" aria-label="Tutup Bandingkan"><i class="fa-solid fa-xmark"></i></button>
+            <div class="compare-wrapper">
+                <div class="compare-header">
+                    <i class="fa-solid fa-scale-balanced" style="color:var(--primary);font-size:2rem;"></i>
+                    <div>
+                        <h2 id="compareTitle" data-i18n="comp_title">Bandingkan 2 Destinasi Wisata</h2>
+                        <p data-i18n="comp_sub">Pilih dua tempat wisata di Tanggamus untuk melihat perbandingan fasilitas, tiket, dan kesesuaiannya.</p>
+                    </div>
+                </div>
+
+                <div class="compare-selectors-grid">
+                    <div class="compare-select-box">
+                        <label for="compareSelectA" data-i18n="comp_dest_1">Pilih Destinasi Pertama:</label>
+                        <select id="compareSelectA" class="select-custom"></select>
+                    </div>
+                    <div class="compare-vs-badge">VS</div>
+                    <div class="compare-select-box">
+                        <label for="compareSelectB" data-i18n="comp_dest_2">Pilih Destinasi Kedua:</label>
+                        <select id="compareSelectB" class="select-custom"></select>
+                    </div>
+                </div>
+
+                <div id="compareTableContainer" class="compare-table-wrap">
+                    <!-- Rendered by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL 3: Kontak Darurat Wisata Tanggamus (Emergency SOS)
+    ====================================================== -->
+    <div id="emergencyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="emergencyTitle">
+        <div class="modal-content modal-emergency-content">
+            <button class="modal-close-btn" id="emergencyCloseBtn" aria-label="Tutup Kontak Darurat"><i class="fa-solid fa-xmark"></i></button>
+            <div class="emergency-wrapper">
+                <div class="emergency-header">
+                    <div class="emergency-icon-pulse"><i class="fa-solid fa-truck-medical"></i></div>
+                    <div>
+                        <h2 id="emergencyTitle" data-i18n="sos_title">Kontak Darurat Wisata Tanggamus (SOS)</h2>
+                        <p data-i18n="sos_sub">Layanan bantuan darurat, medis, SAR laut, dan keamanan 24 Jam di Kabupaten Tanggamus.</p>
+                    </div>
+                </div>
+
+                <div class="emergency-grid" id="emergencyGrid">
+                    <!-- Injected by JS -->
+                </div>
+
+                <div class="emergency-footer-note">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span data-i18n="sos_note">Jika mengalami kendala keselamatan di laut Teluk Kiluan / Pantai Gigi Hiu, segera hubungi Pos Basarnas SAR atau Polsek setempat.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         MODAL 4: Fullscreen Photo Lightbox
+    ====================================================== -->
+    <div id="lightboxModal" class="lightbox-modal" role="dialog" aria-modal="true" aria-label="Tampilan Foto Penuh">
+        <button class="lightbox-close" id="lightboxClose" aria-label="Tutup Foto"><i class="fa-solid fa-xmark"></i></button>
+        <button class="lightbox-nav lightbox-prev" id="lightboxPrev" aria-label="Foto Sebelumnya"><i class="fa-solid fa-chevron-left"></i></button>
+        <button class="lightbox-nav lightbox-next" id="lightboxNext" aria-label="Foto Berikutnya"><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="lightbox-img-wrap">
+            <img id="lightboxImg" src="" alt="Pratinjau Foto Wisata Tanggamus">
+            <div class="lightbox-caption" id="lightboxCaption"></div>
+        </div>
+        <div class="lightbox-thumb-strip" id="lightboxThumbStrip" role="list" aria-label="Galeri Foto"></div>
+    </div>
+
+    <!-- =====================================================
+         MODAL 5: Detail Rekomendasi Kuliner & Tempat Beli
+    ====================================================== -->
+    <div id="culinaryModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="culinaryModalTitle">
+        <div class="modal-content modal-detail-enhanced">
+            <button class="modal-close-btn" id="culinaryModalCloseBtn" onclick="tutupCulinaryModal()" aria-label="Tutup Detail Kuliner"><i class="fa-solid fa-xmark"></i></button>
+            <div id="culinaryModalBody"></div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         GAME 1: Belajar Mengetik Bahasa Indonesia
+    ====================================================== -->
+    <div id="typingGameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="typingGameTitle">
+        <div class="modal-content game-modal-content">
+            <button class="modal-close-btn" id="typingGameClose" aria-label="Tutup Game Mengetik"><i class="fa-solid fa-xmark"></i></button>
+            <div class="game-wrapper">
+                <div class="game-topbar">
+                    <div class="game-title-area">
+                        <i class="fa-solid fa-keyboard game-icon-main"></i>
+                        <div>
+                            <h3 id="typingGameTitle">Belajar Mengetik Bahasa Indonesia</h3>
+                            <p class="game-subtitle">Ketik kalimat di bawah dengan tepat dan cepat!</p>
+                        </div>
+                    </div>
+                    <div class="game-stats-bar">
+                        <div class="game-stat-box">
+                            <span class="stat-label">⏱ Waktu</span>
+                            <span class="stat-val" id="typingTimer">60</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">⚡ KPM</span>
+                            <span class="stat-val" id="typingWPM">0</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">🎯 Akurasi</span>
+                            <span class="stat-val" id="typingAccuracy">100%</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">✅ Kalimat</span>
+                            <span class="stat-val" id="typingSentenceCount">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="typing-area-wrap" id="typingGameArea">
+                    <div id="typingStartScreen" class="typing-start-screen">
+                        <div class="typing-start-icon">⌨️</div>
+                        <h2>Siap Mengetik?</h2>
+                        <p>Ketik kalimat-kalimat tentang wisata Tanggamus dengan tepat dan cepat. Waktu 60 detik!</p>
+                        <button class="btn-game-start" id="btnStartTyping">
+                            <i class="fa-solid fa-play"></i> Mulai Game
+                        </button>
+                    </div>
+
+                    <div id="typingGamePlay" style="display:none;">
+                        <div class="typing-sentence-display" id="typingSentenceDisplay"></div>
+                        <textarea id="typingInput" class="typing-input" placeholder="Mulai ketik di sini..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Area mengetik"></textarea>
+                        <div class="typing-progress-bar">
+                            <div class="typing-progress-fill" id="typingProgressFill"></div>
+                        </div>
+                    </div>
+
+                    <div id="typingResultScreen" style="display:none;" class="typing-result">
+                        <h2>🎉 Waktu Habis!</h2>
+                        <div class="result-stats-grid">
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="resultWPM">0</span>
+                                <span class="result-stat-label">Kata Per Menit</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="resultAccuracy">0%</span>
+                                <span class="result-stat-label">Akurasi</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="resultSentences">0</span>
+                                <span class="result-stat-label">Kalimat Selesai</span>
+                            </div>
+                        </div>
+                        <button class="btn-game-start" id="btnRestartTyping">
+                            <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         GAME 2: Tebak-Tebakan Wisata Tanggamus
+    ====================================================== -->
+    <div id="quizGameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="quizGameTitle">
+        <div class="modal-content game-modal-content">
+            <button class="modal-close-btn" id="quizGameClose" aria-label="Tutup Game Kuis"><i class="fa-solid fa-xmark"></i></button>
+            <div class="game-wrapper">
+                <div class="game-topbar">
+                    <div class="game-title-area">
+                        <i class="fa-solid fa-lightbulb game-icon-main" style="color:#f59e0b;"></i>
+                        <div>
+                            <h3 id="quizGameTitle">Tebak-Tebakan Wisata Tanggamus</h3>
+                            <p class="game-subtitle">Uji pengetahuanmu tentang wisata Lampung!</p>
+                        </div>
+                    </div>
+                    <div class="game-stats-bar">
+                        <div class="game-stat-box">
+                            <span class="stat-label">❓ Soal</span>
+                            <span class="stat-val" id="quizQuestionNum">1 / 10</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">⏱ Waktu</span>
+                            <span class="stat-val" id="quizTimer">15</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">⭐ Skor</span>
+                            <span class="stat-val" id="quizScore">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-area-wrap">
+                    <div id="quizStartScreen" class="typing-start-screen">
+                        <div class="typing-start-icon">🧩</div>
+                        <h2>Siap Ditebak?</h2>
+                        <p>10 pertanyaan seru tentang destinasi wisata, budaya, dan alam di Kabupaten Tanggamus, Lampung. Setiap soal 15 detik!</p>
+                        <button class="btn-game-start" id="btnStartQuiz">
+                            <i class="fa-solid fa-play"></i> Mulai Kuis
+                        </button>
+                    </div>
+
+                    <div id="quizGamePlay" style="display:none;">
+                        <div class="quiz-timer-bar">
+                            <div class="quiz-timer-fill" id="quizTimerFill"></div>
+                        </div>
+                        <div class="quiz-question-card">
+                            <div class="quiz-category-tag" id="quizCategory">Kategori</div>
+                            <h2 class="quiz-question-text" id="quizQuestionText">Pertanyaan muncul di sini...</h2>
+                        </div>
+                        <div class="quiz-options-grid" id="quizOptionsGrid">
+                            <!-- Options injected by JS -->
+                        </div>
+                        <div class="quiz-feedback" id="quizFeedback"></div>
+                    </div>
+
+                    <div id="quizResultScreen" style="display:none;" class="typing-result">
+                        <h2 id="quizResultEmoji">🏆</h2>
+                        <h3 id="quizResultTitle">Hasil Kuis</h3>
+                        <div class="result-stats-grid">
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="quizFinalScore">0</span>
+                                <span class="result-stat-label">Total Skor</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="quizCorrectCount">0 / 10</span>
+                                <span class="result-stat-label">Jawaban Benar</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="quizHighScore">0</span>
+                                <span class="result-stat-label">Rekor Tertinggi</span>
+                            </div>
+                        </div>
+                        <p class="quiz-result-msg" id="quizResultMsg"></p>
+                        <button class="btn-game-start" id="btnRestartQuiz">
+                            <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         GAME 3: Penjaga Laut Tanggamus (Tembak-Tembakan)
+    ====================================================== -->
+    <div id="shooterGameModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="shooterGameTitle">
+        <div class="modal-content game-modal-content shooter-modal-content">
+            <button class="modal-close-btn" id="shooterGameClose" aria-label="Tutup Game Tembak-Tembakan"><i class="fa-solid fa-xmark"></i></button>
+            <div class="game-wrapper">
+                <div class="game-topbar">
+                    <div class="game-title-area">
+                        <i class="fa-solid fa-crosshairs game-icon-main" style="color:#ef4444;"></i>
+                        <div>
+                            <h3 id="shooterGameTitle">Penjaga Laut Tanggamus</h3>
+                            <p class="game-subtitle">Tembak sampah laut & lindungi keasrian Teluk Kiluan!</p>
+                        </div>
+                    </div>
+                    <div class="game-stats-bar">
+                        <div class="game-stat-box">
+                            <span class="stat-label">⏱ Waktu</span>
+                            <span class="stat-val" id="shooterTimer">45</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">🎯 Skor</span>
+                            <span class="stat-val" id="shooterScore">0</span>
+                        </div>
+                        <div class="game-stat-box">
+                            <span class="stat-label">🔥 Combo</span>
+                            <span class="stat-val" id="shooterCombo">x1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="shooter-area-wrap">
+                    <div id="shooterStartScreen" class="typing-start-screen">
+                        <div class="typing-start-icon">🎯</div>
+                        <h2>Siap Menjaga Laut?</h2>
+                        <p>Tembak botol, kaleng, dan limbah plastik yang mengambang di perairan Teluk Kiluan. <strong>Jangan tembak lumba-lumba atau penyu!</strong></p>
+                        <div class="shooter-legend">
+                            <div class="legend-item"><span class="legend-emoji">🍾</span><span>Botol (+100)</span></div>
+                            <div class="legend-item"><span class="legend-emoji">🥫</span><span>Kaleng (+150)</span></div>
+                            <div class="legend-item"><span class="legend-emoji">🛢️</span><span>Limbah (+300)</span></div>
+                            <div class="legend-item"><span class="legend-emoji">🦪</span><span>Mutiara (+500)</span></div>
+                            <div class="legend-item legend-danger"><span class="legend-emoji">🐬</span><span>Lumba-lumba (-250)</span></div>
+                        </div>
+                        <button class="btn-game-start" id="btnStartShooter">
+                            <i class="fa-solid fa-crosshairs"></i> Mulai Menembak!
+                        </button>
+                    </div>
+
+                    <div id="shooterGamePlay" style="display:none;" class="shooter-play-container">
+                        <canvas id="shooterCanvas" class="shooter-canvas"></canvas>
+                        <div class="shooter-hud-overlay">
+                            <div class="shooter-combo-meter" id="shooterComboMeter" style="display:none;">COMBO x<span id="shooterComboVal">1</span>! 🔥</div>
+                        </div>
+                    </div>
+
+                    <div id="shooterResultScreen" style="display:none;" class="typing-result">
+                        <h2 id="shooterResultEmoji">🏆</h2>
+                        <h3 id="shooterResultTitle">Hasil Misi Laut</h3>
+                        <div class="result-stats-grid">
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="shooterFinalScore">0</span>
+                                <span class="result-stat-label">Total Skor</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="shooterTrashCleaned">0</span>
+                                <span class="result-stat-label">Sampah Dihancurkan</span>
+                            </div>
+                            <div class="result-stat">
+                                <span class="result-stat-val" id="shooterHighScore">0</span>
+                                <span class="result-stat-label">Rekor Tertinggi</span>
+                            </div>
+                        </div>
+                        <p class="quiz-result-msg" id="shooterResultMsg"></p>
+                        <button class="btn-game-start" id="btnRestartShooter">
+                            <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3><i class="fa-solid fa-compass"></i> Eksplor Tanggamus</h3>
+                    <p data-i18n="footer_desc">Platform informasi dan panduan destinasi pariwisata resmi Kabupaten Tanggamus, Provinsi Lampung.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-icon" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#" class="social-icon" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="social-icon" aria-label="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="social-icon" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="footer-title" data-i18n="footer_cat">Kategori Wisata</h4>
+                    <ul class="footer-links">
+                        <li><a href="#destinasi" data-i18n="cat_beach">Pantai & Bahari</a></li>
+                        <li><a href="#destinasi" data-i18n="cat_waterfall">Air Terjun Eksotis</a></li>
+                        <li><a href="#destinasi" data-i18n="cat_adventure">Pendakian Gunung</a></li>
+                        <li><a href="#kuliner" data-i18n="nav_culinary">Kuliner & Oleh-Oleh</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="footer-title" data-i18n="footer_info">Informasi & Layanan</h4>
+                    <ul class="footer-links">
+                        <li><a href="#kalkulator" data-i18n="nav_budget">Kalkulator Biaya Wisata</a></li>
+                        <li><a href="#transportasi" data-i18n="nav_route">Panduan Rute Perjalanan</a></li>
+                        <li><a href="#" id="footerEmergencyLink" data-i18n="footer_sos">Kontak Darurat (SOS)</a></li>
+                        <li><a href="#" id="footerCompareLink" data-i18n="comp_title">Bandingkan Destinasi</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Eksplor Tanggamus. Dibuat dengan cinta untuk pariwisata Lampung.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Floating Back to Top Button with Scroll Ring -->
+    <button id="btnBackToTop" class="btn-back-to-top" title="Kembali ke atas" aria-label="Kembali ke atas">
+        <i class="fa-solid fa-arrow-up"></i>
+        <svg class="progress-ring" width="46" height="46">
+            <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.15)" stroke-width="3" fill="transparent" r="20" cx="23" cy="23"/>
+            <circle class="progress-ring-circle" id="progressRingCircle" stroke="var(--primary)" stroke-width="3" stroke-linecap="round" fill="transparent" r="20" cx="23" cy="23"/>
+        </svg>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
